@@ -131,11 +131,9 @@ public class TownHallManager {
         // Use SchematicManager to build the structure
         plugin.getSchematicManager().buildTownHall(townHall, center);
         
-        // Also build the nexus structure if enabled
-        if (plugin.getConfig().getBoolean("townhall.build-nexus", true)) {
-            int nexusDistance = plugin.getConfig().getInt("townhall.nexus-distance", 10);
-            plugin.getSchematicManager().buildNexus(townHall.getType(), center.clone().add(0, 0, nexusDistance));
-        }
+        // Note: Nexus building is now handled separately via /f nexus place command
+        // The nexus system uses end crystals with holograms, not schematics
+        // This ensures players have control over nexus placement timing and location
     }
     
     /**

@@ -257,6 +257,13 @@ public class SqliteDatabaseProvider implements DatabaseProvider {
                         Kingdom kingdom = plugin.getKingdomManager().getKingdom(kingdomId);
                         if (kingdom != null) {
                             player.setKingdom(kingdom);
+                            // Ensure the player is in the kingdom's member list
+                            if (!kingdom.getMembers().contains(playerId)) {
+                                kingdom.addMember(playerId);
+                                plugin.getLogger().info("Re-added player " + playerId + " to kingdom " + kingdom.getName());
+                            }
+                        } else {
+                            plugin.getLogger().warning("Kingdom " + kingdomId + " not found for player " + playerId);
                         }
                     } catch (IllegalArgumentException e) {
                         plugin.getLogger().warning("Invalid kingdom ID for player " + playerId + ": " + kingdomIdStr);

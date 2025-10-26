@@ -192,6 +192,19 @@ public class AllianceManager {
         return true;
     }
     
+    public boolean areAtWar(Kingdom kingdom1, Kingdom kingdom2) {
+        if (kingdom1 == null || kingdom2 == null) return false;
+        
+        UUID kingdom1Id = kingdom1.getKingdomId();
+        UUID kingdom2Id = kingdom2.getKingdomId();
+        
+        // Cannot be at war with yourself
+        if (kingdom1Id.equals(kingdom2Id)) return false;
+        
+        // At war if they are enemies OR if they can PvP (not allies)
+        return areEnemies(kingdom1Id, kingdom2Id) || canPvP(kingdom1Id, kingdom2Id);
+    }
+    
     public boolean canInteractInTerritory(UUID kingdomId, UUID territoryOwnerId) {
         // Own territory
         if (kingdomId.equals(territoryOwnerId)) return true;
