@@ -1,0 +1,18 @@
+Place your nexus schematics here.
+
+Required files:
+- medieval_nexus.schem (or .schematic)
+- fantasy_nexus.schem (or .schematic)
+- modern_nexus.schem (or .schematic)
+
+These schematics will be used when nexus structures are built for kingdoms.
+
+Tips:
+- Use WorldEdit to create and save your schematics
+- Make sure the origin point is at the base center of the structure
+- Nexus structures should be smaller than town halls (recommended 5x5x5 to 10x10x10)
+- Include a beacon or distinctive central block to represent the nexus core
+- Match the theme of the corresponding town hall type:
+  * Medieval: Stone, beacon, medieval materials
+  * Fantasy: Purpur, amethyst, magical materials
+  * Modern: Quartz, concrete, sleek materials

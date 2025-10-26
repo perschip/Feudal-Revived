@@ -1,0 +1,176 @@
+# Spanish Language File for Feudal RPG Plugin
+# Archivo de idioma español para el plugin Feudal RPG
+# Use {0}, {1}, {2}, etc. for placeholders
+
+# General Messages
+general:
+  prefix: '§6[Feudal]§r '
+  no-permission: '§c¡No tienes permisos para usar este comando!'
+  player-not-found: '§c¡Jugador no encontrado!'
+  invalid-usage: '§c¡Uso inválido! Usa /feudal help para ver los comandos.'
+  invalid-challenge-id: '§c¡ID de desafío inválido!'
+  
+# Command Usage Messages
+commands:
+  usage: '§cUso: {0}'
+  
+# Kingdom Messages
+kingdom:
+  must-be-in-kingdom: '§c¡Debes estar en un reino para usar este comando!'
+  must-be-leader: '§c¡Solo los líderes del reino pueden usar este comando!'
+  not-found: '§c¡Reino ''{0}'' no encontrado!'
+  cannot-ally-self: '§c¡No puedes aliarte con tu propio reino!'
+  
+# Alliance Messages
+alliance:
+  proposed: '§a§l¡Alianza Propuesta! §7Tu solicitud de alianza ha sido enviada a {0}'
+  failed: '§c¡Falló al crear la alianza!'
+  
+# Challenge Messages
+challenge:
+  accepted: '§a§l¡Desafío Aceptado! §7¡Prepárate para la batalla!'
+  cancelled: '§e§l¡Desafío Cancelado! §7Tu desafío ha sido cancelado.'
+  failed-accept: '§c¡Falló al aceptar el desafío!'
+  failed-cancel: '§c¡Falló al cancelar el desafío!'
+  
+# Territory Messages
+territory:
+  entered-capital: '§6§lEntraste al Territorio Capital de {0}'
+  entered-enemy: '§c§lEntraste al Territorio Enemigo de {0}'
+  entered-own: '§a§lEntraste a Tu Territorio: {0}'
+  entered-ally: '§b§lEntraste al Territorio Aliado de {0}'
+  entered-neutral: '§e§lEntraste al Territorio Neutral de {0}'
+  protected: '§c§l¡Territorio Protegido! §7Esta área pertenece a §e{0}§7.'
+
+# Claiming Messages
+claiming:
+  must-be-in-kingdom: '§c¡Debes estar en un reino para reclamar territorio!'
+  must-be-leader: '§c¡Solo los líderes del reino pueden reclamar territorio!'
+  single-success: '§a§l¡Territorio Reclamado! §7Este chunk ahora pertenece a tu reino!'
+  multi-success: '§a§l¡Territorios Reclamados! §7Se reclamaron exitosamente {0} chunks para tu reino!'
+  partial-success: '§e§l¡Éxito Parcial! §7Se reclamaron {0} de {1} chunks solicitados.'
+  failed: '§c¡Falló al reclamar territorio! Puede que ya esté reclamado o tu reino esté en su límite.'
+  no-connected-chunks: '§c¡No se encontraron chunks conectados válidos para reclamar!'
+  invalid-amount: '§c¡Cantidad inválida! Por favor especifica un número entre 1 y 25.'
+  not-connected: '§c¡No se puede reclamar chunk en {0}, {1} - no está conectado a tu territorio!'
+  already-claimed: '§c¡El chunk en {0}, {1} ya está reclamado!'
+  scanning: '§7Escaneando chunks conectados para reclamar...'
+
+# Town Hall Messages
+townhall:
+  already-in-kingdom: '§c¡Ya estás en un reino!'
+  name-taken: '§c¡El nombre del reino ''{0}'' ya está en uso!'
+  invalid-name-length: '§c¡El nombre del reino debe tener entre 3 y 20 caracteres!'
+  creation-cancelled: '§7Creación del reino cancelada.'
+  kingdom-created: '§a§l¡Reino Fundado! §7¡Bienvenido a §e{0}§7 con un §6{1}§7!'
+  creation-failed: '§cFalló al crear el reino. Por favor intenta de nuevo.'
+  not-found: '§c¡Tu reino no tiene un ayuntamiento!'
+  upgrade-coming-soon: '§e¡Sistema de mejoras próximamente!'
+  feature-coming-soon: '§e¡Esta característica estará disponible pronto!'
+  max-level: '§c¡Tu ayuntamiento ya está en el nivel máximo!'
+  already-upgrading: '§c¡Tu ayuntamiento ya se está mejorando!'
+  insufficient-funds: '§c¡Fondos insuficientes! Necesitas §6{0} monedas §cpara mejorar.'
+  upgrade-started: '§a§l¡Mejora Iniciada! §7El Ayuntamiento se está mejorando al nivel {0}.'
+  upgrade-complete: '§a§l¡Mejora Completa! §7¡El Ayuntamiento ahora es nivel {0}!'
+  
+# Territory Visualization Messages
+visualization:
+  enabled: '§a§l¡Vista de Territorio Activada! §7Mostrando chunks reclamados con partículas.'
+  disabled: '§e§l¡Vista de Territorio Desactivada!'
+  
+# Map Messages
+map:
+  header: '§6§l=== Mapa de Territorio ==='
+  center: '§7Centro: §e{0}, {1}'
+  legend: '§7Leyenda: §a■§7=Propio §c■§7=Enemigo §b■§7=Aliado §e■§7=Neutral §8■§7=Sin reclamar'
+  statistics-header: '§6§lEstadísticas de Territorio:'
+  stats-own: '§a■ §7Propio: §e{0}'
+  stats-allied: '§b■ §7Aliado: §e{0}'
+  stats-enemy: '§c■ §7Enemigo: §e{0}'
+  stats-neutral: '§e■ §7Neutral: §e{0}'
+  stats-unclaimed: '§8■ §7Sin reclamar: §e{0}'
+  
+# Welcome Messages
+welcome:
+  header: '§6§l=== ¡Bienvenido a Feudal RPG! ==='
+  description: '§7¡Construye tu reino, sube de nivel tus profesiones y desafía a otros al combate!'
+  help-tip: '§7Usa §e/feudal help §7para comenzar.'
+  
+# GUI Messages
+gui:
+  main-menu-title: 'Feudal RPG - Menú Principal'
+  territory-map-title: 'Mapa de Territorio'
+  back-button: '§7« Atrás'
+  close-button: '§c✖ Cerrar'
+  
+# Territory Map GUI Messages
+territory-map:
+  navigation:
+    north: '§f⬆ Norte'
+    south: '§f⬇ Sur'
+    east: '§f➡ Este'
+    west: '§f⬅ Oeste'
+    center: '§e⌂ Centrar en Ti'
+    zoom-in: '§a+ Acercar'
+    zoom-out: '§c- Alejar'
+  legend:
+    own: '§a■ Tu Reino'
+    ally: '§b■ Reino Aliado'
+    enemy: '§c■ Reino Enemigo'
+    neutral: '§e■ Reino Neutral'
+    unclaimed: '§8■ Tierra Sin Reclamar'
+  territory-info:
+    header: '§6Información del Territorio'
+    kingdom: '§7Reino: §e{0}'
+    type: '§7Tipo: §e{0}'
+    power: '§7Poder: §e{0}'
+    relationship: '§7Relación: {0}'
+    coordinates: '§7Coordenadas: §e{0}, {1}'
+    unclaimed-land: '§7Esta es tierra salvaje sin reclamar'
+  relationships:
+    own: '§a§lTU REINO'
+    ally: '§b§lALIADO'
+    enemy: '§c§lENEMIGO'
+    neutral: '§e§lNEUTRAL'
+    
+# Error Messages
+error:
+  command-failed: '§c¡El comando falló al ejecutarse!'
+  data-load-failed: '§c¡Falló al cargar los datos del jugador!'
+  permission-denied: '§c¡No tienes permisos para hacer eso!'
+  
+# Success Messages
+success:
+  data-saved: '§a¡Datos guardados exitosamente!'
+  action-completed: '§a¡Acción completada exitosamente!'
+
+# Database Messages
+database:
+  connection-failed: '§c¡Falló la conexión a la base de datos! Los datos pueden no persistir correctamente.'
+  auto-save-enabled: '§aGuardado automático habilitado con intervalos de {0} minutos.'
+  auto-save-disabled: '§eGuardado automático deshabilitado.'
+  saving-data: '§7Guardando datos del plugin automáticamente...'
+  save-completed: '§aGuardado automático completado.'
+  loading-data: '§7Cargando datos existentes...'
+  load-completed: '§aCarga de datos completada.'
+  initialized: '§aAlmacenamiento de datos inicializado con {0}'
+
+# Mensajes de Nexus
+nexus:
+  already-exists: '§c¡Tu reino ya tiene un nexus!'
+  must-be-in-territory: '§c¡Solo puedes colocar un nexus en el territorio de tu reino!'
+  location-blocked: '§c¡Esta ubicación está bloqueada! Despeja un área de 5x5 para colocar el nexus.'
+  placed: '§a§l¡Nexus Colocado! §7El nexus de tu reino está ahora en {0}, {1}'
+  removed: '§e§l¡Nexus Removido! §7El nexus de tu reino ha sido removido.'
+  not-found: '§c¡Tu reino no tiene un nexus!'
+  placed-successfully: '§a§l¡Nexus colocado exitosamente!'
+  removed-successfully: '§e§l¡Nexus removido exitosamente!'
+  cannot-break: '§c§l¡Protegido! §7Este nexus está protegido y no puede ser roto.'
+  no-kingdom: '§c¡Debes estar en un reino para dañar un nexus!'
+  own-nexus: '§c¡No puedes dañar el nexus de tu propio reino!'
+  not-at-war: '§c¡Solo puedes dañar el nexus durante una guerra con {0}!'
+  damaged: '§c§l¡Nexus Bajo Ataque! §7Salud: §c{0}§7/§a{1}'
+  damage-dealt: '§a§l¡Daño Infligido! §7Infligiste §c{0} §7de daño al nexus de §e{1}§7!'
+
+# Mensajes de Debug/Prueba (remover si no es necesario)
+test: '§7Mensaje de prueba - esto debería ser removido en producción'

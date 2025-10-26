@@ -1,0 +1,16 @@
+Place your modern fortress town hall schematics here.
+
+Required files:
+- level_1.schem (or .schematic)
+- level_2.schem (or .schematic)
+- level_3.schem (or .schematic)
+- ... up to level_10.schem
+
+These schematics will be used when players create or upgrade their modern fortress town halls.
+
+Tips:
+- Use WorldEdit to create and save your schematics
+- Make sure the origin point is at the base center of the structure
+- Scale structures appropriately for each level (level 1 = small, level 10 = large)
+- Use modern-themed blocks like quartz, concrete, iron blocks, glass, etc.
+- Consider clean, geometric designs with advanced materials

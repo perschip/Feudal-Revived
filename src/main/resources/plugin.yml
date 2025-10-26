@@ -1,0 +1,33 @@
+name: Feudal
+version: '1.0-SNAPSHOT'
+main: dev.minefaze.feudal.Feudal
+api-version: '1.21'
+description: 'A comprehensive RPG plugin featuring kingdoms, professions, attributes, and honor-based PvP combat'
+author: 'MineFaze'
+website: 'https://www.minefaze.net'
+
+commands:
+  feudal:
+    description: 'Main command for Feudal RPG plugin'
+    usage: '/feudal <subcommand>'
+    aliases: ['f', 'frpg']
+
+permissions:
+  feudal.use:
+    description: 'Basic permission to use Feudal commands'
+    default: true
+  feudal.admin:
+    description: 'Administrative permissions for Feudal'
+    default: op
+  feudal.kingdom.create:
+    description: 'Permission to create kingdoms'
+    default: true
+  feudal.kingdom.leader:
+    description: 'Permission to use kingdom leader commands'
+    default: true
+  feudal.challenge:
+    description: 'Permission to challenge other players'
+    default: true
+  feudal.territory.claim:
+    description: 'Permission to claim territory'
+    default: true

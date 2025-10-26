@@ -1,0 +1,175 @@
+# English Language File for Feudal RPG Plugin
+# Use {0}, {1}, {2}, etc. for placeholders
+
+# General Messages
+general:
+  prefix: '§6[Feudal]§r '
+  no-permission: '§cYou do not have permission to use this command!'
+  player-not-found: '§cPlayer not found!'
+  invalid-usage: '§cInvalid usage! Use /feudal help for commands.'
+  invalid-challenge-id: '§cInvalid challenge ID!'
+  
+# Command Usage Messages
+commands:
+  usage: '§cUsage: {0}'
+  
+# Kingdom Messages
+kingdom:
+  must-be-in-kingdom: '§cYou must be in a kingdom to use this command!'
+  must-be-leader: '§cOnly kingdom leaders can use this command!'
+  not-found: '§cKingdom ''{0}'' not found!'
+  cannot-ally-self: '§cYou cannot ally with your own kingdom!'
+  
+# Alliance Messages
+alliance:
+  proposed: '§a§lAlliance Proposed! §7Your alliance request has been sent to {0}'
+  failed: '§cFailed to create alliance!'
+  
+# Challenge Messages
+challenge:
+  accepted: '§a§lChallenge Accepted! §7Prepare for battle!'
+  cancelled: '§e§lChallenge Cancelled! §7Your challenge has been cancelled.'
+  failed-accept: '§cFailed to accept challenge!'
+  failed-cancel: '§cFailed to cancel challenge!'
+  
+# Territory Messages
+territory:
+  entered-capital: '§6§lEntered Capital Territory of {0}'
+  entered-enemy: '§c§lEntered Enemy Territory of {0}'
+  entered-own: '§a§lEntered Your Territory: {0}'
+  entered-ally: '§b§lEntered Allied Territory of {0}'
+  entered-neutral: '§e§lEntered Neutral Territory of {0}'
+  protected: '§c§lProtected Territory! §7This area belongs to §e{0}§7.'
+
+# Claiming Messages
+claiming:
+  must-be-in-kingdom: '§cYou must be in a kingdom to claim territory!'
+  must-be-leader: '§cOnly kingdom leaders can claim territory!'
+  single-success: '§a§lTerritory Claimed! §7This chunk now belongs to your kingdom!'
+  multi-success: '§a§lTerritories Claimed! §7Successfully claimed {0} chunks for your kingdom!'
+  partial-success: '§e§lPartial Success! §7Claimed {0} out of {1} requested chunks.'
+  failed: '§cFailed to claim territory! It may already be claimed or your kingdom may be at its limit.'
+  no-connected-chunks: '§cNo valid connected chunks found to claim!'
+  invalid-amount: '§cInvalid amount! Please specify a number between 1 and 25.'
+  not-connected: '§cCannot claim chunk at {0}, {1} - not connected to your territory!'
+  already-claimed: '§cChunk at {0}, {1} is already claimed!'
+  scanning: '§7Scanning for connected chunks to claim...'
+
+# Town Hall Messages
+townhall:
+  already-in-kingdom: '§cYou are already in a kingdom!'
+  name-taken: '§cKingdom name ''{0}'' is already taken!'
+  invalid-name-length: '§cKingdom name must be between 3 and 20 characters!'
+  creation-cancelled: '§7Kingdom creation cancelled.'
+  kingdom-created: '§a§lKingdom Founded! §7Welcome to §e{0}§7 with a §6{1}§7!'
+  creation-failed: '§cFailed to create kingdom. Please try again.'
+  not-found: '§cYour kingdom does not have a town hall!'
+  upgrade-coming-soon: '§eUpgrade system coming soon!'
+  feature-coming-soon: '§eThis feature is coming soon!'
+  max-level: '§cYour town hall is already at maximum level!'
+  already-upgrading: '§cYour town hall is already upgrading!'
+  insufficient-funds: '§cInsufficient funds! You need §6{0} coins §cto upgrade.'
+  upgrade-started: '§a§lUpgrade Started! §7Town Hall is upgrading to level {0}.'
+  upgrade-complete: '§a§lUpgrade Complete! §7Town Hall is now level {0}!'
+  
+# Territory Visualization Messages
+visualization:
+  enabled: '§a§lTerritory View Enabled! §7Showing claimed chunks with particles.'
+  disabled: '§e§lTerritory View Disabled!'
+  
+# Map Messages
+map:
+  header: '§6§l=== Territory Map ==='
+  center: '§7Center: §e{0}, {1}'
+  legend: '§7Legend: §a■§7=Own §c■§7=Enemy §b■§7=Ally §e■§7=Neutral §8■§7=Unclaimed'
+  statistics-header: '§6§lTerritory Statistics:'
+  stats-own: '§a■ §7Own: §e{0}'
+  stats-allied: '§b■ §7Allied: §e{0}'
+  stats-enemy: '§c■ §7Enemy: §e{0}'
+  stats-neutral: '§e■ §7Neutral: §e{0}'
+  stats-unclaimed: '§8■ §7Unclaimed: §e{0}'
+  
+# Welcome Messages
+welcome:
+  header: '§6§l=== Welcome to Feudal RPG! ==='
+  description: '§7Build your kingdom, level your professions, and challenge others to combat!'
+  help-tip: '§7Use §e/feudal help §7to get started.'
+  
+# GUI Messages
+gui:
+  main-menu-title: 'Feudal RPG - Main Menu'
+  territory-map-title: 'Territory Map'
+  back-button: '§7« Back'
+  close-button: '§c✖ Close'
+  
+# Territory Map GUI Messages
+territory-map:
+  navigation:
+    north: '§f⬆ North'
+    south: '§f⬇ South'
+    east: '§f➡ East'
+    west: '§f⬅ West'
+    center: '§e⌂ Center on You'
+    zoom-in: '§a+ Zoom In'
+    zoom-out: '§c- Zoom Out'
+  legend:
+    own: '§a■ Your Kingdom'
+    ally: '§b■ Allied Kingdom'
+    enemy: '§c■ Enemy Kingdom'
+    neutral: '§e■ Neutral Kingdom'
+    unclaimed: '§8■ Unclaimed Land'
+  territory-info:
+    header: '§6Territory Information'
+    kingdom: '§7Kingdom: §e{0}'
+    type: '§7Type: §e{0}'
+    power: '§7Power: §e{0}'
+    relationship: '§7Relationship: {0}'
+    coordinates: '§7Coordinates: §e{0}, {1}'
+    unclaimed-land: '§7This is unclaimed wilderness'
+  relationships:
+    own: '§a§lYOUR KINGDOM'
+    ally: '§b§lALLY'
+    enemy: '§c§lENEMY'
+    neutral: '§e§lNEUTRAL'
+    
+# Error Messages
+error:
+  command-failed: '§cCommand failed to execute!'
+  data-load-failed: '§cFailed to load player data!'
+  permission-denied: '§cYou don''t have permission to do that!'
+  
+# Success Messages
+success:
+  data-saved: '§aData saved successfully!'
+  action-completed: '§aAction completed successfully!'
+
+# Database Messages
+database:
+  connection-failed: '§cDatabase connection failed! Data may not persist correctly.'
+  auto-save-enabled: '§aAuto-save enabled with {0} minute intervals.'
+  auto-save-disabled: '§eAuto-save disabled.'
+  saving-data: '§7Auto-saving plugin data...'
+  save-completed: '§aAuto-save completed.'
+  loading-data: '§7Loading existing data...'
+  load-completed: '§aData loading completed.'
+  initialized: '§aData storage initialized with {0}'
+
+# Nexus Messages
+nexus:
+  already-exists: '§cYour kingdom already has a nexus!'
+  must-be-in-territory: '§cYou can only place a nexus in your kingdom''s territory!'
+  location-blocked: '§cThis location is blocked! Clear a 5x5 area to place the nexus.'
+  placed: '§a§lNexus Placed! §7Your kingdom''s nexus is now at {0}, {1}'
+  removed: '§e§lNexus Removed! §7Your kingdom''s nexus has been removed.'
+  not-found: '§cYour kingdom does not have a nexus!'
+  placed-successfully: '§a§lNexus placed successfully!'
+  removed-successfully: '§e§lNexus removed successfully!'
+  cannot-break: '§c§lProtected! §7This nexus is protected and cannot be broken.'
+  no-kingdom: '§cYou must be in a kingdom to damage a nexus!'
+  own-nexus: '§cYou cannot damage your own kingdom''s nexus!'
+  not-at-war: '§cYou can only damage nexus during war with {0}!'
+  damaged: '§c§lNexus Under Attack! §7Health: §c{0}§7/§a{1}'
+  damage-dealt: '§a§lDamage Dealt! §7You dealt §c{0} §7damage to §e{1}§7''s nexus!'
+
+# Debug/Test Messages (remove if not needed)
+test: '§7Test message - this should be removed in production'

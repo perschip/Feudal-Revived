@@ -1,0 +1,313 @@
+# ========================================
+# Feudal RPG Plugin Configuration
+# ========================================
+# Server owners can customize all aspects of the Feudal RPG experience here.
+# After making changes, use /feudal reload to apply them without restarting.
+
+# ========================================
+# GENERAL SETTINGS
+# ========================================
+general:
+  # Enable debug messages in console
+  debug: false
+  # Auto-save interval in minutes (0 to disable)
+  auto-save-interval: 10
+  # Language file to use (available: en, es)
+  language: 'en'
+  # Plugin prefix for messages
+  prefix: '§6[Feudal]§r '
+  # Enable welcome message for new players
+  welcome-message: true
+
+# ========================================
+# KINGDOM SETTINGS
+# ========================================
+kingdoms:
+  # Maximum number of kingdoms allowed on the server
+  max-kingdoms: 50
+  # Maximum territories per member in a kingdom
+  territories-per-member: 3
+  # Cost to create a kingdom (requires economy plugin)
+  creation-cost: 1000
+  # Minimum distance between kingdom capitals (in blocks)
+  min-capital-distance: 500
+  # Maximum members per kingdom (0 = unlimited)
+  max-members: 0
+  # Kingdom name requirements
+  name:
+    min-length: 3
+    max-length: 20
+    # Allow special characters in kingdom names
+    allow-special-chars: false
+  # Starting resources for new kingdoms
+  starting:
+    treasury: 500
+    territories: 9  # 3x3 area around capital
+
+# ========================================
+# TOWN HALL SETTINGS
+# ========================================
+townhall:
+  # Enable town hall upgrade system
+  enable-upgrades: true
+  # Upgrade cost multiplier (higher = more expensive)
+  cost-multiplier: 1.0
+  # Upgrade time multiplier (higher = longer upgrades)
+  time-multiplier: 1.0
+  # Maximum town hall level
+  max-level: 10
+  # Auto-build town hall structures using schematics
+  auto-build: true
+  # Build nexus structures alongside town halls
+  build-nexus: true
+  # Distance between town hall and nexus (blocks)
+  nexus-distance: 10
+
+# ========================================
+# NEXUS SETTINGS
+# ========================================
+nexus:
+  # Enable nexus regeneration
+  enable-regeneration: true
+  # Regeneration delay after damage (minutes)
+  regen-delay: 5
+  # Regeneration rate (health per minute)
+  regen-rate: 10
+  # Nexus invulnerability time after kingdom creation (hours)
+  protection-time: 24
+
+# ========================================
+# ALLIANCE & NATION SETTINGS
+# ========================================
+alliances:
+  # Maximum alliances per kingdom
+  max-alliances: 5
+  # Enable automatic nation ally support in wars
+  nation-auto-support: true
+  # Alliance proposal expiration (hours)
+  proposal-expiration: 48
+  # Maximum kingdoms per nation
+  max-nation-members: 10
+
+# ========================================
+# CHALLENGE SETTINGS
+# ========================================
+challenges:
+  # Challenge expiration time in hours
+  expiration-hours: 24
+  # Combat timeout in seconds
+  combat-timeout: 300
+  # Allow challenges in wilderness (non-kingdom territory)
+  allow-wilderness-challenges: true
+  # Cooldown between challenges in minutes
+  challenge-cooldown: 30
+  # Maximum active challenges per player
+  max-active-challenges: 3
+  # Enable challenge wagering
+  enable-wagering: true
+  # Maximum wager amount
+  max-wager: 10000
+
+# ========================================
+# COMBAT SETTINGS
+# ========================================
+combat:
+  # Enable attribute-based damage modification
+  attribute-damage-scaling: true
+  # Enable profession bonuses in combat
+  profession-bonuses: true
+  # Prevent friendly fire within kingdoms
+  prevent-friendly-fire: true
+  # Prevent friendly fire between allies
+  prevent-ally-fire: true
+  # Require challenges for PvP (disable random PvP)
+  require-challenges: true
+  # Combat tag duration (seconds)
+  combat-tag-duration: 15
+  # Damage scaling factors
+  scaling:
+    strength-damage: 0.05    # 5% damage increase per strength point above 10
+    defense-reduction: 0.03  # 3% damage reduction per defense point above 10
+    agility-crit: 0.02      # 2% crit chance per agility point above 10
+
+# ========================================
+# EXPERIENCE SETTINGS
+# ========================================
+experience:
+  # Base experience for various activities
+  mining-base-exp: 5
+  farming-base-exp: 3
+  building-base-exp: 2
+  combat-kill-exp: 25
+  combat-participation-exp: 10
+  # Experience multipliers
+  intelligence-exp-bonus: 0.1  # 10% bonus per intelligence point above 10
+  # Level requirements (experience needed for each level)
+  level-scaling: 1.5  # Exponential scaling factor
+  # Maximum profession level
+  max-profession-level: 100
+  # Maximum attribute level
+  max-attribute-level: 100
+
+# ========================================
+# TERRITORY SETTINGS
+# ========================================
+territories:
+  # Enable territory protection
+  enable-protection: true
+  # Allow building in wilderness
+  allow-wilderness-building: true
+  # Territory defense bonus scaling
+  defense-scaling: 1.0
+  # Maximum territories per kingdom (0 = based on town hall level)
+  max-territories: 0
+  # Territory claiming costs
+  claiming:
+    # Base cost per territory
+    base-cost: 100
+    # Cost multiplier for each additional territory
+    cost-multiplier: 1.2
+  # Territory types and their bonuses
+  types:
+    capital:
+      defense-bonus: 2.0
+      resource-bonus: 1.5
+    fortress:
+      defense-bonus: 3.0
+      resource-bonus: 1.0
+    outpost:
+      defense-bonus: 1.5
+      resource-bonus: 1.2
+    farm:
+      defense-bonus: 1.0
+      resource-bonus: 2.0
+    mine:
+      defense-bonus: 1.0
+      resource-bonus: 2.0
+
+# ========================================
+# VISUALIZATION SETTINGS
+# ========================================
+visualization:
+  # Enable territory particle borders
+  enable-particles: true
+  # Particle update interval (seconds)
+  particle-interval: 1
+  # Maximum particle view distance
+  max-view-distance: 100
+  # Territory map settings
+  map:
+    # Default map radius
+    default-radius: 5
+    # Maximum map radius
+    max-radius: 10
+    # Enable GUI map by default
+    default-gui: true
+
+# ========================================
+# ECONOMY INTEGRATION
+# ========================================
+economy:
+  # Enable economy features (requires Vault)
+  enabled: false
+  # Currency symbol
+  currency-symbol: '$'
+  # Kingdom treasury settings
+  treasury:
+    # Enable kingdom treasury
+    enabled: true
+    # Tax rate on member earnings (0.0 to 1.0)
+    tax-rate: 0.05
+    # Minimum treasury balance
+    min-balance: 0
+
+# ========================================
+# DATABASE SETTINGS
+# ========================================
+database:
+  # Storage type: 'yaml', 'sqlite', or 'mysql'
+  type: 'yaml'
+  # SQLite settings (only used if type is 'sqlite')
+  sqlite:
+    filename: 'feudal.db'
+    # Enable WAL mode for better performance
+    wal-mode: true
+  # MySQL settings (only used if type is 'mysql')
+  mysql:
+    host: 'localhost'
+    port: 3306
+    database: 'feudal'
+    username: 'feudal_user'
+    password: 'password'
+    # Connection pool settings
+    max-connections: 10
+    connection-timeout: 30000
+    # Enable SSL connection
+    use-ssl: false
+
+# ========================================
+# SCHEMATIC SETTINGS
+# ========================================
+schematics:
+  # Enable schematic building system
+  enabled: true
+  # Blocks placed per tick (lower = less lag, slower building)
+  blocks-per-tick: 50
+  # Enable schematic loading on startup
+  load-on-startup: true
+  # Supported schematic formats
+  supported-formats:
+    - '.schem'    # WorldEdit 7+ format (preferred)
+    - '.schematic' # Legacy WorldEdit format
+  # Fallback to default structures if schematic missing
+  use-fallback: true
+  # Log schematic building progress
+  log-building: true
+
+# ========================================
+# PERFORMANCE SETTINGS
+# ========================================
+performance:
+  # Async data saving
+  async-saves: true
+  # Batch size for database operations
+  batch-size: 100
+  # Cache settings
+  cache:
+    # Player data cache size
+    player-cache-size: 1000
+    # Kingdom data cache size
+    kingdom-cache-size: 500
+    # Cache expiration time (minutes)
+    cache-expiration: 30
+
+# ========================================
+# WORLD SETTINGS
+# ========================================
+worlds:
+  # Worlds where Feudal is enabled
+  enabled-worlds:
+    - 'world'
+    - 'world_nether'
+    - 'world_the_end'
+  # Worlds where kingdoms can be created
+  kingdom-worlds:
+    - 'world'
+  # Disable Feudal in specific worlds
+  disabled-worlds: []
+
+# ========================================
+# INTEGRATION SETTINGS
+# ========================================
+integrations:
+  # PlaceholderAPI integration
+  placeholderapi: true
+  # WorldGuard integration
+  worldguard: true
+  # Dynmap integration (show kingdoms on map)
+  dynmap: false
+  # Discord integration (requires DiscordSRV)
+  discord:
+    enabled: false
+    # Webhook URL for kingdom events
+    webhook-url: ''
