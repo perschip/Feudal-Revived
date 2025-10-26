@@ -1,10 +1,30 @@
 package dev.minefaze.feudal.models;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Kingdom {
+    
+    public enum JoinType {
+        OPEN("Open", "Anyone can join"),
+        CLOSED("Closed", "No one can join"),
+        INVITE_ONLY("Invite Only", "Only invited players can join");
+        
+        private final String displayName;
+        private final String description;
+        
+        JoinType(String displayName, String description) {
+            this.displayName = displayName;
+            this.description = description;
+        }
+        
+        public String getDisplayName() { return displayName; }
+        public String getDescription() { return description; }
+    }
     
     private final UUID kingdomId;
     private String name;
@@ -17,6 +37,7 @@ public class Kingdom {
     private Map<String, Object> settings;
     private TownHall townHall;
     private Nexus nexus;
+    private JoinType joinType;
     
     public Kingdom(UUID kingdomId, String name, UUID leader, Location capital) {
         this.kingdomId = kingdomId;
@@ -28,6 +49,7 @@ public class Kingdom {
         this.treasury = 0;
         this.creationTime = System.currentTimeMillis();
         this.settings = new HashMap<>();
+        this.joinType = JoinType.OPEN; // Default to open
         
         // Add leader as first member
         members.add(leader);
@@ -58,6 +80,17 @@ public class Kingdom {
     public boolean isMember(UUID playerId) { return members.contains(playerId); }
     public int getMemberCount() { return members.size(); }
     
+    /**
+     * Get all online members of this kingdom
+     * @return List of online Player objects who are members of this kingdom
+     */
+    public List<Player> getOnlineMembers() {
+        return members.stream()
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+    
     public Set<Territory> getTerritories() { return new HashSet<>(territories); }
     public void addTerritory(Territory territory) { territories.add(territory); }
     public void removeTerritory(Territory territory) { territories.remove(territory); }
@@ -79,6 +112,9 @@ public class Kingdom {
     
     public long getCreationTime() { return creationTime; }
     public Map<String, Object> getSettings() { return settings; }
+    
+    public JoinType getJoinType() { return joinType; }
+    public void setJoinType(JoinType joinType) { this.joinType = joinType; }
     
     // Utility methods
     public boolean isLeader(UUID playerId) { return leader.equals(playerId); }

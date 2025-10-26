@@ -7,6 +7,8 @@ import dev.minefaze.feudal.listeners.CombatListener;
 import dev.minefaze.feudal.listeners.PvPListener;
 import dev.minefaze.feudal.listeners.TerritoryListener;
 import dev.minefaze.feudal.gui.GUIManager;
+import dev.minefaze.feudal.gui.AnvilGUI;
+import dev.minefaze.feudal.gui.KingdomListGUI;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Feudal extends JavaPlugin {
@@ -26,12 +28,22 @@ public final class Feudal extends JavaPlugin {
     private TownHallManager townHallManager;
     private SchematicManager schematicManager;
     private NexusManager nexusManager;
+    
+    // GUI Managers
+    private AnvilGUI anvilGUI;
+    private KingdomListGUI kingdomListGUI;
 
     @Override
     public void onEnable() {
         instance = this;
         
         getLogger().info("Starting Feudal RPG Plugin...");
+        
+        // Initialize configuration
+        saveDefaultConfig();
+        reloadConfig();
+        validateConfig();
+        getLogger().info("Configuration loaded successfully!");
         
         // Initialize message manager first (needed by other managers)
         messageManager = new MessageManager(this);
@@ -52,10 +64,18 @@ public final class Feudal extends JavaPlugin {
         combatManager = new CombatManager(this);
         guiManager = new GUIManager(this);
         
-        // Load existing data
+        // Initialize GUI utilities
+        anvilGUI = new AnvilGUI(this);
+        kingdomListGUI = new KingdomListGUI(this);
+        
+        // Load existing data in proper order
         getLogger().info(messageManager.getMessage("database.loading-data"));
         kingdomManager.loadKingdomData();
         nexusManager.loadNexusData();
+        
+        // Register player data manager as listener to handle player join/quit events
+        getServer().getPluginManager().registerEvents(playerDataManager, this);
+        
         getLogger().info(messageManager.getMessage("database.load-completed"));
         
         // Start auto-save task
@@ -98,7 +118,50 @@ public final class Feudal extends JavaPlugin {
             townHallManager.shutdown();
         }
         
+        // Shutdown GUI utilities
+        if (anvilGUI != null) {
+            anvilGUI.shutdown();
+        }
+        if (kingdomListGUI != null) {
+            kingdomListGUI.shutdown();
+        }
+        
         getLogger().info("Feudal RPG Plugin disabled.");
+    }
+    
+    /**
+     * Validate configuration values and warn about invalid settings
+     */
+    private void validateConfig() {
+        // Validate auto-save interval
+        int autoSaveInterval = getConfig().getInt("general.auto-save-interval", 10);
+        if (autoSaveInterval < 0) {
+            getLogger().warning("Invalid auto-save-interval: " + autoSaveInterval + ". Using default: 10");
+            getConfig().set("general.auto-save-interval", 10);
+        }
+        
+        // Validate kingdom settings
+        int maxKingdoms = getConfig().getInt("kingdoms.max-kingdoms", 50);
+        if (maxKingdoms < 1) {
+            getLogger().warning("Invalid max-kingdoms: " + maxKingdoms + ". Using default: 50");
+            getConfig().set("kingdoms.max-kingdoms", 50);
+        }
+        
+        // Validate database type
+        String dbType = getConfig().getString("database.type", "yaml").toLowerCase();
+        if (!dbType.equals("yaml") && !dbType.equals("sqlite") && !dbType.equals("mysql")) {
+            getLogger().warning("Invalid database type: " + dbType + ". Using default: yaml");
+            getConfig().set("database.type", "yaml");
+        }
+        
+        // Validate language
+        String language = getConfig().getString("general.language", "en");
+        if (language == null || language.trim().isEmpty()) {
+            getLogger().warning("Invalid language setting. Using default: en");
+            getConfig().set("general.language", "en");
+        }
+        
+        getLogger().info("Configuration validation completed");
     }
     
     private void startAutoSaveTask() {
@@ -130,4 +193,8 @@ public final class Feudal extends JavaPlugin {
     public TownHallManager getTownHallManager() { return townHallManager; }
     public SchematicManager getSchematicManager() { return schematicManager; }
     public NexusManager getNexusManager() { return nexusManager; }
+    
+    // GUI Getters
+    public AnvilGUI getAnvilGUI() { return anvilGUI; }
+    public KingdomListGUI getKingdomListGUI() { return kingdomListGUI; }
 }

@@ -19,6 +19,16 @@ kingdom:
   must-be-leader: '§cOnly kingdom leaders can use this command!'
   not-found: '§cKingdom ''{0}'' not found!'
   cannot-ally-self: '§cYou cannot ally with your own kingdom!'
+  joined-successfully: '§a§lJoined Kingdom! §7Welcome to §6{0}§7!'
+  left-successfully: '§e§lLeft Kingdom! §7You have left §6{0}§7.'
+  member-joined: '§a§l{0} §7has joined the kingdom!'
+  member-left: '§e§l{0} §7has left the kingdom.'
+  cannot-leave-own: '§cYou cannot leave your own kingdom! Use §e/f kingdom disband §cto disband it.'
+  at-member-limit: '§cKingdom §e{0} §cis at its member limit!'
+  disband-no-confirmation: '§cYou must first request to disband your kingdom. Use §e/f kingdom disband §cfirst.'
+  disband-confirmation-expired: '§cDisband confirmation has expired. Please try again.'
+  disbanded-successfully: '§c§lKingdom Disbanded! §7Your kingdom §e{0} §7has been permanently deleted.'
+  disbanded-by-leader: '§c§lKingdom Disbanded! §7The kingdom §e{0} §7has been disbanded by §c{1}§7.'
   
 # Alliance Messages
 alliance:
@@ -71,6 +81,10 @@ townhall:
   insufficient-funds: '§cInsufficient funds! You need §6{0} coins §cto upgrade.'
   upgrade-started: '§a§lUpgrade Started! §7Town Hall is upgrading to level {0}.'
   upgrade-complete: '§a§lUpgrade Complete! §7Town Hall is now level {0}!'
+  already-exists: '§cYour kingdom already has a town hall!'
+  must-be-in-territory: '§cYou must place the town hall in your kingdom territory!'
+  placed-successfully: '§a§lTown Hall placed successfully!'
+  removed-successfully: '§e§lTown Hall removed successfully!'
   
 # Territory Visualization Messages
 visualization:
@@ -165,11 +179,15 @@ nexus:
   placed-successfully: '§a§lNexus placed successfully!'
   removed-successfully: '§e§lNexus removed successfully!'
   cannot-break: '§c§lProtected! §7This nexus is protected and cannot be broken.'
+  cannot-break-own: '§c§lProtected! §7You cannot break your own kingdom''s nexus!'
+  must-be-in-territory: '§cYou must place the nexus in your kingdom territory!'
+  location-blocked: '§cThis location is not suitable for nexus placement!'
   no-kingdom: '§cYou must be in a kingdom to damage a nexus!'
   own-nexus: '§cYou cannot damage your own kingdom''s nexus!'
   not-at-war: '§cYou can only damage nexus during war with {0}!'
   damaged: '§c§lNexus Under Attack! §7Health: §c{0}§7/§a{1}'
   damage-dealt: '§a§lDamage Dealt! §7You dealt §c{0} §7damage to §e{1}§7''s nexus!'
 
-# Debug/Test Messages (remove if not needed)
-test: '§7Test message - this should be removed in production'
+# Success Messages
+success:
+  action-completed: '§a§lSuccess! §7Action completed successfully.'

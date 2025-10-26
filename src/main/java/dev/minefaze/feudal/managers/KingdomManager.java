@@ -23,9 +23,9 @@ public class KingdomManager {
         this.territories = new HashMap<>();
     }
     
-    public Kingdom createKingdom(String name, UUID leaderId, Location capital) {
-        // Check if kingdom name is already taken
-        if (kingdomsByName.containsKey(name.toLowerCase())) {
+    public synchronized Kingdom createKingdom(String name, UUID leaderId, Location capital) {
+        // Check if kingdom name is already taken (thread-safe)
+        if (kingdomsByName.containsKey(name.trim().toLowerCase())) {
             return null;
         }
         
@@ -41,7 +41,7 @@ public class KingdomManager {
         
         // Register kingdom
         kingdoms.put(kingdomId, kingdom);
-        kingdomsByName.put(name.toLowerCase(), kingdomId);
+        kingdomsByName.put(name.trim().toLowerCase(), kingdomId);
         
         // Register territories
         for (Territory territory : kingdom.getTerritories()) {
@@ -91,7 +91,9 @@ public class KingdomManager {
     }
     
     public Kingdom getKingdomByName(String name) {
-        UUID kingdomId = kingdomsByName.get(name.toLowerCase());
+        if (name == null) return null;
+        String normalizedName = name.trim().toLowerCase();
+        UUID kingdomId = kingdomsByName.get(normalizedName);
         return kingdomId != null ? kingdoms.get(kingdomId) : null;
     }
     
@@ -100,20 +102,24 @@ public class KingdomManager {
         return player != null ? player.getKingdom() : null;
     }
     
-    public Territory getTerritoryAt(Chunk chunk) {
+    public synchronized Territory getTerritoryAt(Chunk chunk) {
         return territories.get(chunk);
     }
     
-    public Territory getTerritoryAt(Location location) {
+    public synchronized Territory getTerritoryAt(Location location) {
         return getTerritoryAt(location.getChunk());
     }
     
-    public boolean claimTerritory(UUID kingdomId, Chunk chunk, TerritoryType type) {
+    public synchronized boolean claimTerritory(UUID kingdomId, Chunk chunk, TerritoryType type) {
         Kingdom kingdom = kingdoms.get(kingdomId);
-        if (kingdom == null) return false;
+        if (kingdom == null) {
+            plugin.getLogger().warning("claimTerritory: Kingdom " + kingdomId + " not found");
+            return false;
+        }
         
         // Check if chunk is already claimed
         if (territories.containsKey(chunk)) {
+            plugin.getLogger().warning("claimTerritory: Chunk " + chunk.getX() + "," + chunk.getZ() + " is already claimed");
             return false;
         }
         
@@ -282,12 +288,48 @@ public class KingdomManager {
     }
     
     /**
+     * Validate that a 3x3 area around the center chunk is available for kingdom creation
+     */
+    private boolean validateAreaForKingdom(Chunk centerChunk) {
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                Chunk chunk = centerChunk.getWorld().getChunkAt(
+                    centerChunk.getX() + x, 
+                    centerChunk.getZ() + z
+                );
+                
+                Territory existingTerritory = getTerritoryAt(chunk);
+                if (existingTerritory != null) {
+                    Kingdom owningKingdom = getKingdom(existingTerritory.getKingdomId());
+                    String ownerName = owningKingdom != null ? owningKingdom.getName() : "Unknown";
+                    plugin.getLogger().warning("Validation failed: Chunk " + chunk.getX() + "," + chunk.getZ() + " is already claimed by " + ownerName);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /**
      * Create kingdom with town hall and claim 3x3 chunks
      */
-    public Kingdom createKingdomWithTownHall(String name, UUID leaderId, Location location, TownHall.TownHallType type) {
-        // Check if kingdom name already exists
-        if (getKingdomByName(name) != null) {
+    public synchronized Kingdom createKingdomWithTownHall(String name, UUID leaderId, Location location, TownHall.TownHallType type) {
+        // Double-check if kingdom name already exists (thread-safe)
+        plugin.getLogger().info("Attempting to create kingdom '" + name + "' (normalized: '" + name.trim().toLowerCase() + "')");
+        plugin.getLogger().info("Current kingdoms: " + kingdomsByName.keySet());
+        
+        Kingdom existingKingdom = getKingdomByName(name);
+        if (existingKingdom != null) {
+            plugin.getLogger().warning("Kingdom creation failed - name '" + name + "' already exists (existing: '" + existingKingdom.getName() + "')");
             return null;
+        }
+        
+        // Additional check - iterate through all kingdoms to double-check
+        for (Kingdom kingdom : kingdoms.values()) {
+            if (kingdom.getName().trim().equalsIgnoreCase(name.trim())) {
+                plugin.getLogger().warning("Kingdom creation failed - found duplicate name via iteration: '" + kingdom.getName() + "' matches '" + name + "'");
+                return null;
+            }
         }
         
         UUID kingdomId = UUID.randomUUID();
@@ -298,8 +340,14 @@ public class KingdomManager {
         // Initialize town hall and nexus
         kingdom.initializeTownHallAndNexus(type);
         
-        // Claim 3x3 chunks around the location
+        // Validate that the 3x3 area is available before claiming
         Chunk centerChunk = location.getChunk();
+        if (!validateAreaForKingdom(centerChunk)) {
+            plugin.getLogger().warning("Cannot create kingdom '" + name + "' - area is not suitable (overlapping territories)");
+            return null;
+        }
+        
+        // Claim 3x3 chunks around the location
         int claimedChunks = 0;
         
         for (int x = -1; x <= 1; x++) {
@@ -310,7 +358,11 @@ public class KingdomManager {
                 );
                 
                 // Check if chunk is already claimed
-                if (getTerritoryAt(chunk.getBlock(8, 64, 8).getLocation()) != null) {
+                Territory existingTerritory = getTerritoryAt(chunk);
+                if (existingTerritory != null) {
+                    Kingdom owningKingdom = getKingdom(existingTerritory.getKingdomId());
+                    String ownerName = owningKingdom != null ? owningKingdom.getName() : "Unknown";
+                    plugin.getLogger().warning("Chunk at " + chunk.getX() + "," + chunk.getZ() + " is already claimed by " + ownerName + ", skipping");
                     continue; // Skip already claimed chunks
                 }
                 
@@ -337,9 +389,20 @@ public class KingdomManager {
             }
         }
         
-        // Add kingdom to kingdoms map
+        // Add kingdom to kingdoms map (already synchronized by method)
         kingdoms.put(kingdomId, kingdom);
-        kingdomsByName.put(name.toLowerCase(), kingdomId);
+        kingdomsByName.put(name.trim().toLowerCase(), kingdomId);
+        
+        plugin.getLogger().info("Created kingdom '" + name + "' with ID " + kingdomId + " for player " + leaderId);
+        plugin.getLogger().info("Kingdom registered with normalized name: '" + name.toLowerCase() + "'");
+        
+        // Build the town hall structure
+        if (kingdom.getTownHall() != null) {
+            plugin.getLogger().info("Building town hall for kingdom " + kingdom.getName() + " at " + location);
+            plugin.getSchematicManager().buildTownHall(kingdom.getTownHall(), location);
+        } else {
+            plugin.getLogger().warning("Kingdom " + kingdom.getName() + " has no town hall to build!");
+        }
         
         // Update player data
         FeudalPlayer player = plugin.getPlayerDataManager().getOrCreatePlayer(

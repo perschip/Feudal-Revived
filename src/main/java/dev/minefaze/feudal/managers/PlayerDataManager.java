@@ -117,6 +117,9 @@ public class PlayerDataManager implements Listener {
         FeudalPlayer feudalPlayer = getPlayer(playerId);
         if (feudalPlayer != null) {
             feudalPlayer.setPlayerName(player.getName());
+            
+            // Ensure kingdom relationship is properly restored
+            restoreKingdomRelationship(feudalPlayer);
         }
     }
     
@@ -136,5 +139,39 @@ public class PlayerDataManager implements Listener {
     
     public Map<UUID, FeudalPlayer> getAllPlayers() {
         return new HashMap<>(playerData);
+    }
+    
+    /**
+     * Restore kingdom relationship for a player after loading from database
+     */
+    private void restoreKingdomRelationship(FeudalPlayer feudalPlayer) {
+        if (feudalPlayer.hasKingdom()) {
+            Kingdom kingdom = feudalPlayer.getKingdom();
+            UUID playerId = feudalPlayer.getPlayerId();
+            
+            // Ensure the player is in the kingdom's member list
+            if (!kingdom.getMembers().contains(playerId)) {
+                kingdom.addMember(playerId);
+                plugin.getLogger().info("Restored kingdom membership for player " + 
+                    feudalPlayer.getPlayerName() + " in kingdom " + kingdom.getName());
+                
+                // Save the updated kingdom data
+                plugin.getDataManager().saveKingdomData(kingdom);
+            }
+            
+            // Double-check that the kingdom manager has this kingdom loaded
+            Kingdom managerKingdom = plugin.getKingdomManager().getKingdom(kingdom.getKingdomId());
+            if (managerKingdom == null) {
+                plugin.getLogger().warning("Kingdom " + kingdom.getName() + " not found in KingdomManager for player " + 
+                    feudalPlayer.getPlayerName() + ". This may indicate a data loading issue.");
+            } else if (managerKingdom != kingdom) {
+                // Update player to reference the correct kingdom instance from the manager
+                feudalPlayer.setKingdom(managerKingdom);
+                if (!managerKingdom.getMembers().contains(playerId)) {
+                    managerKingdom.addMember(playerId);
+                    plugin.getDataManager().saveKingdomData(managerKingdom);
+                }
+            }
+        }
     }
 }

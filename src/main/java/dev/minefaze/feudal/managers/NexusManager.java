@@ -84,22 +84,27 @@ public class NexusManager implements Listener {
         }
         
         plugin.getLogger().info("All checks passed, building nexus structure at ground level: " + groundLocation);
-        // Place the end beacon structure at ground level
-        buildNexusStructure(groundLocation, kingdom);
         
-        // Register the nexus at ground level
-        nexusLocations.put(groundLocation, kingdom.getKingdomId());
-        kingdomNexus.put(kingdom.getKingdomId(), groundLocation);
-        activeNexus.add(groundLocation);
+        // Get the block center location for consistent positioning
+        Location blockCenter = groundLocation.getBlock().getLocation().add(0.5, 0, 0.5);
+        
+        // Place the nexus structure at block center
+        buildNexusStructure(blockCenter, kingdom);
+        
+        // Register the nexus at block center location (without the 0.5 offset for block operations)
+        Location registrationLocation = blockCenter.getBlock().getLocation();
+        nexusLocations.put(registrationLocation, kingdom.getKingdomId());
+        kingdomNexus.put(kingdom.getKingdomId(), registrationLocation);
+        activeNexus.add(registrationLocation);
         
         // Initialize nexus in kingdom
         if (kingdom.getNexus() == null) {
             int townHallLevel = kingdom.getTownHall() != null ? kingdom.getTownHall().getLevel() : 1;
             Nexus nexus = new Nexus(kingdom.getKingdomId(), townHallLevel);
-            nexus.setLocation(groundLocation);
+            nexus.setLocation(registrationLocation);
             kingdom.setNexus(nexus);
         } else {
-            kingdom.getNexus().setLocation(groundLocation);
+            kingdom.getNexus().setLocation(registrationLocation);
         }
         
         // Save data
@@ -146,25 +151,33 @@ public class NexusManager implements Listener {
     }
     
     /**
-     * Build the physical nexus structure (end crystal with hologram)
+     * Build the physical nexus structure (obsidian base + end crystal with hologram)
      */
-    private void buildNexusStructure(Location location, Kingdom kingdom) {
-        plugin.getLogger().info("Building nexus structure at " + location);
+    private void buildNexusStructure(Location blockCenterLocation, Kingdom kingdom) {
+        plugin.getLogger().info("Building nexus structure at " + blockCenterLocation);
         
-        // Spawn the end crystal
-        EnderCrystal crystal = (EnderCrystal) location.getWorld().spawnEntity(location, EntityType.END_CRYSTAL);
-        crystal.setShowingBottom(false); // Hide the bedrock base
-        crystal.setInvulnerable(false); // Allow damage during wars
+        // Get the block location for placing obsidian
+        Location blockLocation = blockCenterLocation.getBlock().getLocation();
+        
+        // Place obsidian base block
+        Block baseBlock = blockLocation.getBlock();
+        baseBlock.setType(Material.OBSIDIAN);
+        
+        // Spawn the end crystal on top of the obsidian at block center
+        Location crystalLocation = blockCenterLocation.clone().add(0, 1, 0);
+        EnderCrystal crystal = (EnderCrystal) crystalLocation.getWorld().spawnEntity(crystalLocation, EntityType.END_CRYSTAL);
+        crystal.setShowingBottom(false); // Hide the bedrock base since we have obsidian
+        crystal.setInvulnerable(true); // Make invulnerable - we handle damage manually
         crystal.setCustomName(ChatColor.GOLD + kingdom.getName() + " Nexus");
         crystal.setCustomNameVisible(false); // We'll use hologram instead
         
-        // Store the crystal
-        nexusCrystals.put(location, crystal);
+        // Store the crystal with the block location as key (for consistent lookup)
+        nexusCrystals.put(blockLocation, crystal);
         
-        // Create hologram above the crystal
-        createNexusHologram(location, kingdom);
+        // Create hologram above the crystal (use crystal location for proper positioning)
+        createNexusHologram(crystalLocation, kingdom);
         
-        plugin.getLogger().info("Nexus structure built successfully with end crystal and hologram");
+        plugin.getLogger().info("Nexus structure built successfully with obsidian base, end crystal and hologram");
     }
     
     /**
@@ -189,8 +202,10 @@ public class NexusManager implements Listener {
         ArmorStand hologram2 = createHologramLine(location.clone().add(0, 2.7, 0), line2);
         hologramLines.add(hologram2);
         
-        // Store hologram lines
-        nexusHolograms.put(location, hologramLines);
+        // Store hologram lines (use block location as key for consistency with other operations)
+        Location blockLocation = new Location(location.getWorld(), 
+            location.getBlockX(), location.getBlockY() - 1, location.getBlockZ());
+        nexusHolograms.put(blockLocation, hologramLines);
         
         plugin.getLogger().info("Created hologram for nexus with " + hologramLines.size() + " lines");
     }
@@ -251,6 +266,12 @@ public class NexusManager implements Listener {
         }
         nexusCrystals.remove(location);
         
+        // Remove the obsidian base block
+        Block baseBlock = location.getBlock();
+        if (baseBlock.getType() == Material.OBSIDIAN) {
+            baseBlock.setType(Material.AIR);
+        }
+        
         // Remove hologram armor stands
         List<ArmorStand> holograms = nexusHolograms.get(location);
         if (holograms != null) {
@@ -262,7 +283,7 @@ public class NexusManager implements Listener {
         }
         nexusHolograms.remove(location);
         
-        plugin.getLogger().info("Destroyed nexus structure (crystal and hologram) at " + location);
+        plugin.getLogger().info("Destroyed nexus structure (obsidian base, crystal and hologram) at " + location);
     }
     
     /**
@@ -541,15 +562,60 @@ public class NexusManager implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Location blockLoc = event.getBlock().getLocation();
+        Player player = event.getPlayer();
         
         // Check if block is part of a nexus structure
         for (Location nexusLoc : activeNexus) {
             if (isPartOfNexusStructure(blockLoc, nexusLoc)) {
+                // Special handling for obsidian base block
+                if (blockLoc.equals(nexusLoc) && event.getBlock().getType() == Material.OBSIDIAN) {
+                    // Check if this is the player's own kingdom
+                    UUID kingdomId = nexusLocations.get(nexusLoc);
+                    if (kingdomId != null) {
+                        FeudalPlayer feudalPlayer = plugin.getPlayerDataManager().getPlayer(player.getUniqueId());
+                        if (feudalPlayer != null && feudalPlayer.hasKingdom() && 
+                            feudalPlayer.getKingdom().getKingdomId().equals(kingdomId)) {
+                            event.setCancelled(true);
+                            plugin.getMessageManager().sendMessage(player, "nexus.cannot-break-own");
+                            return;
+                        }
+                    }
+                    
+                    // For enemy kingdoms, treat obsidian break as nexus attack
+                    handleObsidianBreak(event, nexusLoc);
+                    return;
+                }
+                
+                // Cancel breaking of other nexus structure blocks
                 event.setCancelled(true);
-                plugin.getMessageManager().sendMessage(event.getPlayer(), "nexus.cannot-break");
+                plugin.getMessageManager().sendMessage(player, "nexus.cannot-break");
                 return;
             }
         }
+    }
+    
+    /**
+     * Handle obsidian base block breaking as nexus attack
+     */
+    private void handleObsidianBreak(BlockBreakEvent event, Location nexusLocation) {
+        Player player = event.getPlayer();
+        UUID kingdomId = nexusLocations.get(nexusLocation);
+        if (kingdomId == null) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        Kingdom kingdom = plugin.getKingdomManager().getKingdom(kingdomId);
+        if (kingdom == null) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Cancel the block break event - we handle nexus damage manually
+        event.setCancelled(true);
+        
+        // Handle as nexus damage
+        handleNexusDamage(nexusLocation, kingdom, player);
     }
     
     @EventHandler
@@ -615,6 +681,9 @@ public class NexusManager implements Listener {
         // Check if this is a nexus crystal
         if (!nexusCrystals.containsValue(crystal)) return;
         
+        // Always cancel the event - we handle nexus damage manually
+        event.setCancelled(true);
+        
         // Find the exact location key for this crystal
         Location nexusLocation = null;
         for (Map.Entry<Location, EnderCrystal> entry : nexusCrystals.entrySet()) {
@@ -635,54 +704,44 @@ public class NexusManager implements Listener {
         // Handle damage based on attacker type
         if (event.getDamager() instanceof Player) {
             Player attacker = (Player) event.getDamager();
-            handleNexusDamage(nexusLocation, kingdom, attacker, event);
-        } else {
-            // Cancel damage from non-players (explosions, etc.)
-            event.setCancelled(true);
+            handleNexusDamage(nexusLocation, kingdom, attacker);
         }
+        // Always cancel damage from non-players (explosions, etc.) - already cancelled above
     }
     
-    private void handleNexusDamage(Location nexusLocation, Kingdom kingdom, Player attacker, EntityDamageByEntityEvent event) {
+    private void handleNexusDamage(Location nexusLocation, Kingdom kingdom, Player attacker) {
         // Get attacker's kingdom
         FeudalPlayer attackerData = plugin.getPlayerDataManager().getPlayer(attacker.getUniqueId());
         if (attackerData == null) {
-            event.setCancelled(true);
             plugin.getMessageManager().sendMessage(attacker, "nexus.no-kingdom");
             return;
         }
         
         Kingdom attackerKingdom = attackerData.getKingdom();
         if (attackerKingdom == null) {
-            event.setCancelled(true);
             plugin.getMessageManager().sendMessage(attacker, "nexus.no-kingdom");
             return;
         }
         
         // Can't damage own nexus
         if (attackerKingdom.getKingdomId().equals(kingdom.getKingdomId())) {
-            event.setCancelled(true);
             plugin.getMessageManager().sendMessage(attacker, "nexus.own-nexus");
             return;
         }
         
         // Check if kingdoms are at war
         if (!plugin.getAllianceManager().areAtWar(attackerKingdom, kingdom)) {
-            event.setCancelled(true);
             plugin.getMessageManager().sendMessage(attacker, "nexus.not-at-war", kingdom.getName());
             return;
         }
         
-        // Cancel the default damage and apply custom damage
-        event.setCancelled(true);
-        
         // Calculate damage based on player attributes
         int damage = calculateNexusDamage(attacker);
         
-        // Apply damage to nexus
+        // Apply damage to nexus using the proper damage system
         Nexus nexus = kingdom.getNexus();
         if (nexus != null) {
-            int newHealth = Math.max(0, nexus.getCurrentHealth() - damage);
-            nexus.setCurrentHealth(newHealth);
+            nexus.takeDamage(damage, Nexus.DamageType.PHYSICAL);
             
             // Update hologram
             updateNexusHologram(nexusLocation, kingdom);
@@ -692,7 +751,7 @@ public class NexusManager implements Listener {
             notifyKingdomMembers(kingdom, "nexus.damaged", nexus.getCurrentHealth(), nexus.getMaxHealth());
             
             // Check if nexus is destroyed
-            if (newHealth <= 0) {
+            if (nexus.getCurrentHealth() <= 0) {
                 handleNexusDestruction(kingdom, attackerKingdom);
             }
             

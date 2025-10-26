@@ -125,6 +125,16 @@ public class TownHallSelectionGUI extends BaseGUI {
     private void createKingdom(Player player, TownHall.TownHallType type) {
         player.closeInventory();
         
+        // Double-check kingdom name availability before creation
+        plugin.getLogger().info("GUI: Double-checking kingdom name '" + kingdomName + "' availability");
+        Kingdom existingKingdom = plugin.getKingdomManager().getKingdomByName(kingdomName);
+        if (existingKingdom != null) {
+            plugin.getLogger().warning("GUI: Kingdom creation blocked - name '" + kingdomName + "' already exists");
+            plugin.getMessageManager().sendMessage(player, "townhall.name-taken", kingdomName);
+            return;
+        }
+        plugin.getLogger().info("GUI: Kingdom name '" + kingdomName + "' is available, proceeding with creation");
+        
         // Create kingdom with 3x3 chunk claiming
         Kingdom kingdom = plugin.getKingdomManager().createKingdomWithTownHall(
             kingdomName, 

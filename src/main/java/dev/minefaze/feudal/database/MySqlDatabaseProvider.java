@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dev.minefaze.feudal.Feudal;
 import dev.minefaze.feudal.models.*;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -501,22 +502,116 @@ public class MySqlDatabaseProvider implements DatabaseProvider {
     // Simplified implementations for other methods (similar to SQLite but with connection pooling)
     @Override
     public void saveTerritoryData(Territory territory) {
-        // Implementation similar to SQLite but using connection pool
+        String sql = """
+            INSERT INTO territories 
+            (territory_id, kingdom_id, type, defense_level, claim_time, under_attack,
+             chunk_world, chunk_x, chunk_z)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+            kingdom_id = VALUES(kingdom_id),
+            type = VALUES(type),
+            defense_level = VALUES(defense_level),
+            under_attack = VALUES(under_attack)
+        """;
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, territory.getTerritoryId().toString());
+            stmt.setString(2, territory.getKingdomId().toString());
+            stmt.setString(3, territory.getType().name());
+            stmt.setInt(4, territory.getDefenseLevel());
+            stmt.setLong(5, territory.getClaimTime());
+            stmt.setBoolean(6, territory.isUnderAttack());
+            stmt.setString(7, territory.getChunk().getWorld().getName());
+            stmt.setInt(8, territory.getChunk().getX());
+            stmt.setInt(9, territory.getChunk().getZ());
+            
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to save territory data", e);
+        }
     }
     
     @Override
     public Territory loadTerritoryData(UUID territoryId) {
+        String sql = "SELECT * FROM territories WHERE territory_id = ?";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, territoryId.toString());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return createTerritoryFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load territory data for " + territoryId, e);
+        }
+        
         return null;
     }
     
     @Override
     public Map<UUID, Territory> loadAllTerritories() {
-        return new HashMap<>();
+        Map<UUID, Territory> territories = new HashMap<>();
+        String sql = "SELECT * FROM territories";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Territory territory = createTerritoryFromResultSet(rs);
+                if (territory != null) {
+                    territories.put(territory.getTerritoryId(), territory);
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load all territories", e);
+        }
+        
+        return territories;
+    }
+    
+    private Territory createTerritoryFromResultSet(ResultSet rs) throws SQLException {
+        UUID territoryId = UUID.fromString(rs.getString("territory_id"));
+        UUID kingdomId = UUID.fromString(rs.getString("kingdom_id"));
+        String worldName = rs.getString("chunk_world");
+        int chunkX = rs.getInt("chunk_x");
+        int chunkZ = rs.getInt("chunk_z");
+        
+        World world = plugin.getServer().getWorld(worldName);
+        if (world == null) {
+            plugin.getLogger().warning("World " + worldName + " not found for territory " + territoryId);
+            return null;
+        }
+        
+        Chunk chunk = world.getChunkAt(chunkX, chunkZ);
+        TerritoryType type = TerritoryType.valueOf(rs.getString("type"));
+        
+        Territory territory = new Territory(territoryId, kingdomId, chunk, type);
+        territory.setDefenseLevel(rs.getInt("defense_level"));
+        territory.setClaimTime(rs.getLong("claim_time"));
+        territory.setUnderAttack(rs.getBoolean("under_attack"));
+        
+        return territory;
     }
     
     @Override
     public void deleteTerritoryData(UUID territoryId) {
-        // Implementation similar to SQLite
+        String sql = "DELETE FROM territories WHERE territory_id = ?";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, territoryId.toString());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to delete territory data for " + territoryId, e);
+        }
     }
     
     @Override
@@ -607,18 +702,117 @@ public class MySqlDatabaseProvider implements DatabaseProvider {
     
     @Override
     public TownHall loadTownHallData(UUID kingdomId) {
-        // Implementation similar to SQLite
+        String sql = "SELECT * FROM town_halls WHERE kingdom_id = ?";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, kingdomId.toString());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                // Load location
+                Location location = null;
+                String worldName = rs.getString("location_world");
+                if (worldName != null) {
+                    World world = plugin.getServer().getWorld(worldName);
+                    if (world != null) {
+                        double x = rs.getDouble("location_x");
+                        double y = rs.getDouble("location_y");
+                        double z = rs.getDouble("location_z");
+                        location = new Location(world, x, y, z);
+                    }
+                }
+                
+                // Create town hall
+                TownHall.TownHallType type = TownHall.TownHallType.valueOf(rs.getString("type"));
+                TownHall townHall = new TownHall(kingdomId, location, type);
+                
+                // Set properties
+                townHall.setLevel(rs.getInt("level"));
+                townHall.setUpgrading(rs.getBoolean("upgrading"));
+                townHall.setUpgradeStartTime(rs.getLong("upgrade_start_time"));
+                
+                return townHall;
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load town hall data for kingdom " + kingdomId, e);
+        }
+        
         return null;
     }
     
     @Override
     public void saveNexusData(Nexus nexus, UUID kingdomId) {
-        // Implementation similar to town hall
+        String sql = """
+            INSERT INTO nexus 
+            (kingdom_id, current_health, max_health, shield_points, armor, 
+             magic_resistance, regeneration_rate, last_damage_time, regenerating)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+            current_health = VALUES(current_health),
+            max_health = VALUES(max_health),
+            shield_points = VALUES(shield_points),
+            armor = VALUES(armor),
+            magic_resistance = VALUES(magic_resistance),
+            regeneration_rate = VALUES(regeneration_rate),
+            last_damage_time = VALUES(last_damage_time),
+            regenerating = VALUES(regenerating)
+        """;
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, kingdomId.toString());
+            stmt.setInt(2, nexus.getCurrentHealth());
+            stmt.setInt(3, nexus.getMaxHealth());
+            stmt.setInt(4, nexus.getShieldPoints());
+            stmt.setInt(5, nexus.getArmor());
+            stmt.setInt(6, nexus.getMagicResistance());
+            stmt.setInt(7, nexus.getRegenerationRate());
+            stmt.setLong(8, nexus.getLastDamageTime());
+            stmt.setBoolean(9, nexus.isRegenerating());
+            
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to save nexus data", e);
+        }
     }
     
     @Override
     public Nexus loadNexusData(UUID kingdomId) {
-        // Implementation similar to SQLite
+        String sql = "SELECT * FROM nexus WHERE kingdom_id = ?";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, kingdomId.toString());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                // Get the kingdom to determine town hall level
+                Kingdom kingdom = loadKingdomData(kingdomId);
+                int townHallLevel = kingdom != null ? kingdom.getTownHallLevel() : 1;
+                
+                Nexus nexus = new Nexus(kingdomId, townHallLevel);
+                
+                nexus.setCurrentHealth(rs.getInt("current_health"));
+                nexus.setMaxHealth(rs.getInt("max_health"));
+                nexus.setShieldPoints(rs.getInt("shield_points"));
+                
+                // Update defense stats from database
+                nexus.getDefenseStats().put("armor", rs.getInt("armor"));
+                nexus.getDefenseStats().put("magic_resistance", rs.getInt("magic_resistance"));
+                nexus.getDefenseStats().put("regeneration_rate", rs.getInt("regeneration_rate"));
+                nexus.setLastDamageTime(rs.getLong("last_damage_time"));
+                nexus.setRegenerating(rs.getBoolean("regenerating"));
+                
+                return nexus;
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load nexus data for kingdom " + kingdomId, e);
+        }
+        
         return null;
     }
     

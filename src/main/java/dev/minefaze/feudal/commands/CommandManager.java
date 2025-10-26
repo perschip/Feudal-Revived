@@ -1,6 +1,16 @@
 package dev.minefaze.feudal.commands;
 
 import dev.minefaze.feudal.Feudal;
+import dev.minefaze.feudal.commands.HelpCommand;
+import dev.minefaze.feudal.commands.MenuCommand;
+import dev.minefaze.feudal.commands.SubCommand;
+import dev.minefaze.feudal.commands.admin.ReloadCommand;
+import dev.minefaze.feudal.commands.diplomacy.*;
+import dev.minefaze.feudal.commands.kingdom.*;
+import dev.minefaze.feudal.commands.nation.NationCommand;
+import dev.minefaze.feudal.commands.player.*;
+import dev.minefaze.feudal.commands.structure.*;
+import dev.minefaze.feudal.commands.territory.*;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -22,8 +32,13 @@ public class CommandManager {
         registerCommand(new MenuCommand(plugin));
         registerCommand(new StatsCommand(plugin));
         
-        // Kingdom management commands
+        // Kingdom management commands (shortcuts)
         registerCommand(new CreateCommand(plugin));
+        registerCommand(new JoinCommand(plugin));
+        registerCommand(new LeaveCommand(plugin));
+        registerCommand(new DisbandCommand(plugin));
+        registerCommand(new ListCommand(plugin));
+        registerCommand(new InfoCommand(plugin));
         registerCommand(new ClaimCommand(plugin));
         registerCommand(new KingdomCommand(plugin)); // Keep for backward compatibility
         
@@ -48,6 +63,9 @@ public class CommandManager {
         registerCommand(new AttributeCommand(plugin));
         registerCommand(new SchematicCommand(plugin));
         registerCommand(new NexusCommand(plugin));
+        
+        // Admin commands
+        registerCommand(new AdminCommand(plugin));
     }
     
     public void registerCommand(SubCommand command) {

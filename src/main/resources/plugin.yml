@@ -19,6 +19,47 @@ permissions:
   feudal.admin:
     description: 'Administrative permissions for Feudal'
     default: op
+    children:
+      feudal.admin.disband: true
+      feudal.admin.kick: true
+      feudal.admin.promote: true
+      feudal.admin.demote: true
+      feudal.admin.join: true
+      feudal.admin.leave: true
+      feudal.admin.info: true
+      feudal.admin.list: true
+      feudal.admin.tp: true
+      feudal.admin.reload: true
+  feudal.admin.disband:
+    description: 'Permission to disband any kingdom'
+    default: op
+  feudal.admin.kick:
+    description: 'Permission to kick players from kingdoms'
+    default: op
+  feudal.admin.promote:
+    description: 'Permission to promote players to kingdom leader'
+    default: op
+  feudal.admin.demote:
+    description: 'Permission to demote kingdom leaders'
+    default: op
+  feudal.admin.join:
+    description: 'Permission to force players to join kingdoms'
+    default: op
+  feudal.admin.leave:
+    description: 'Permission to force players to leave kingdoms'
+    default: op
+  feudal.admin.info:
+    description: 'Permission to view detailed kingdom information'
+    default: op
+  feudal.admin.list:
+    description: 'Permission to list all kingdoms with admin details'
+    default: op
+  feudal.admin.tp:
+    description: 'Permission to teleport to kingdom locations'
+    default: op
+  feudal.admin.reload:
+    description: 'Permission to reload plugin configuration'
+    default: op
   feudal.kingdom.create:
     description: 'Permission to create kingdoms'
     default: true

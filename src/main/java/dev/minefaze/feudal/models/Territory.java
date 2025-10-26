@@ -9,7 +9,7 @@ public class Territory {
     private final UUID kingdomId;
     private final Chunk chunk;
     private final TerritoryType type;
-    private final long claimTime;
+    private long claimTime;
     private int defenseLevel;
     private boolean underAttack;
     private Challenge activeChallenge;
@@ -30,6 +30,7 @@ public class Territory {
     public Chunk getChunk() { return chunk; }
     public TerritoryType getType() { return type; }
     public long getClaimTime() { return claimTime; }
+    public void setClaimTime(long claimTime) { this.claimTime = claimTime; }
     
     public int getDefenseLevel() { return defenseLevel; }
     public void setDefenseLevel(int defenseLevel) { this.defenseLevel = defenseLevel; }

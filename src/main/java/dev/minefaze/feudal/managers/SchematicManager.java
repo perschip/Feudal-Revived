@@ -84,7 +84,16 @@ public class SchematicManager {
             // Note: Nexus schematics removed - nexus now uses simple end crystal + hologram
             loadDecorationSchematics();
             
-            plugin.getLogger().info("Loaded " + loadedSchematics.size() + " schematics");
+            // Remove any empty schematics that may have been loaded
+            loadedSchematics.entrySet().removeIf(entry -> {
+                boolean isEmpty = entry.getValue().getBlocks().isEmpty();
+                if (isEmpty) {
+                    plugin.getLogger().warning("Removing empty schematic: " + entry.getKey());
+                }
+                return isEmpty;
+            });
+            
+            plugin.getLogger().info("Loaded " + loadedSchematics.size() + " valid schematics");
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to load schematics", e);
         }
@@ -106,8 +115,12 @@ public class SchematicManager {
                     File schemFile = new File(typeFolder, "level_" + level + ".schem");
                     File legacyFile = new File(typeFolder, "level_" + level + ".schematic");
                     
-                    File fileToLoad = schemFile.exists() ? schemFile : 
-                                     legacyFile.exists() ? legacyFile : null;
+                    File fileToLoad = null;
+                    if (schemFile.exists() && isValidSchematicFile(schemFile)) {
+                        fileToLoad = schemFile;
+                    } else if (legacyFile.exists() && isValidSchematicFile(legacyFile)) {
+                        fileToLoad = legacyFile;
+                    }
                     
                     if (fileToLoad != null) {
                         try {
@@ -160,6 +173,22 @@ public class SchematicManager {
                 }
             }
         }
+    }
+    
+    /**
+     * Check if a file is a valid schematic file (not a placeholder text file)
+     */
+    private boolean isValidSchematicFile(File file) {
+        if (!file.exists() || file.length() < 100) { // Schematic files should be at least 100 bytes
+            return false;
+        }
+        
+        String name = file.getName().toLowerCase();
+        if (name.endsWith(".txt") || name.contains("place_") || name.contains("readme")) {
+            return false;
+        }
+        
+        return name.endsWith(".schem") || name.endsWith(".schematic");
     }
     
     /**
@@ -306,8 +335,26 @@ public class SchematicManager {
         // Create a simple 5x5x5 structure as default
         Map<Location, Material> blocks = new HashMap<>();
         
-        // This would be replaced with actual schematic data
-        return new SchematicData(5, 5, 5, blocks);
+        // Create a basic structure with some blocks
+        for (int x = -2; x <= 2; x++) {
+            for (int z = -2; z <= 2; z++) {
+                // Floor
+                blocks.put(new Location(null, x, 0, z), Material.STONE_BRICKS);
+                
+                // Walls (only on edges)
+                if (x == -2 || x == 2 || z == -2 || z == 2) {
+                    blocks.put(new Location(null, x, 1, z), Material.STONE_BRICKS);
+                    blocks.put(new Location(null, x, 2, z), Material.STONE_BRICKS);
+                }
+            }
+        }
+        
+        // Add a door
+        blocks.put(new Location(null, 0, 1, 2), Material.AIR);
+        blocks.put(new Location(null, 0, 2, 2), Material.AIR);
+        
+        plugin.getLogger().info("Created default schematic with " + blocks.size() + " blocks");
+        return new SchematicData(5, 3, 5, blocks);
     }
     
     /**
@@ -325,14 +372,14 @@ public class SchematicManager {
         plugin.getLogger().info("Looking for schematic with key: " + key);
         SchematicData schematic = loadedSchematics.get(key);
         
-        if (schematic == null) {
-            plugin.getLogger().warning("No schematic found for: " + key + ". Building default structure.");
+        if (schematic == null || schematic.getBlocks().isEmpty()) {
+            plugin.getLogger().warning("No valid schematic found for: " + key + ". Building default structure.");
             plugin.getLogger().info("Available schematics: " + loadedSchematics.keySet());
             buildDefaultTownHall(townHall, location);
             return;
         }
         
-        plugin.getLogger().info("Found schematic, building at location: " + location);
+        plugin.getLogger().info("Found valid schematic with " + schematic.getBlocks().size() + " blocks, building at location: " + location);
         buildSchematic(schematic, location, "Town Hall");
     }
     
