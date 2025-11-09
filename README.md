@@ -154,7 +154,7 @@ Player data, kingdoms, territories, and challenges are stored in YAML files in t
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Fedual Is a private non-open sourced project. Feudal must be purchased in order to use.
 
 ## Support
 
